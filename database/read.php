@@ -15,6 +15,7 @@
   </style>
 </head>
 <body>
+  <?php include 'menu.php'; ?>
   <h1>Tabla Productos</h1>
   <p>
     <a href="create.html">Crear nuevo Producto</a>

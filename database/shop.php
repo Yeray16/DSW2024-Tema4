@@ -8,6 +8,7 @@
   <title>Shop</title>
 </head>
 <body>
+  <?php include 'menu.php'; ?>
   <h1>Página de compra</h1>
   <form action="process_shop.php" method="post">
     <p>Selecciona un usuario: 
