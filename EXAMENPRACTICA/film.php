@@ -10,10 +10,15 @@
     <section id="films">
         <h2>Peliculas</h2>
         <?php
+            $category_film = $_GET['film'];
+
             try{
                 $stmtCategory = $link->prepare('SELECT category_id, name FROM category');
                 $stmtCategory->execute();
                 $categories = $stmtCategory->fetchAll(PDO::FETCH_OBJ);
+
+                $stmtTable = $link->prepare('SELECT title FROM film INNER JOIN film_category ON film.film_id = film_category.film_id INNER JOIN category ON film_category.category_id = category.category_id WHERE category_id=:category_id');
+                $stmtTable->bindParam(':category_film', $category_film);
         ?>
         <form action="film.php" method="get">
           <fieldset>
@@ -22,7 +27,7 @@
               <option selected disabled>Elige una categoría</option>  
               <?php
                 foreach($categories as $category) {
-                    printf("<option>%s</option>", $category->name);
+                    printf('<option value="film">%s</option>', $category->name);
                 }
               ?>            
             </select>
@@ -31,10 +36,7 @@
           </fieldset>
         </form>
         <?php
-        $stmtCategory = null; 
-            } catch (Exception $e){
-                die('Se jodio: '. $e->getMessage());
-            }    
+            $stmtCategory = null;    
         ?>
         <nav>
             <fieldset>
@@ -54,7 +56,19 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <?php
+                    $stmtTable->execute();
+                    $films = $stmtTable->fetchAll(PDO::FETCH_OBJ);
+                    foreach($films as $film){
+                        printf('<tr><td>%s</td><td>%d</td><td>%d</td>',
+                                $film->title, $film->release_year, $film->length);
+                    }
+                    
+                } catch (Exception $e){
+                    die('Se jodio: '. $e->getMessage());
+                } 
+                ?>
+                <!-- <tr>
                     <td>El tercer hombre</td>
                     <td class="center">1949</td>
                     <td class="center">108</td>
@@ -63,7 +77,7 @@
                             <button>Cambiar categorías</button>
                         </a>               
                     </td>
-                </tr>
+                </tr> -->
             </tbody>
         </table>
     </section>
