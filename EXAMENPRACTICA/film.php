@@ -1,6 +1,31 @@
 <?php
 include "top.php";
 require 'connectionPDO.php';
+if (isset($_GET['delete'])) { 
+    try { 
+        $category_id = isset($_GET['category']) ? ($_GET['category']) : ''; // Verificar si la categoría tiene películas asociadas 
+        
+        $stmtCheckMovies = $link->prepare('SELECT COUNT(*) FROM film_category WHERE category_id = :category_id'); 
+        $stmtCheckMovies->bindParam(':category_id', $category_id); 
+        $stmtCheckMovies->execute(); 
+        $movieCount = $stmtCheckMovies->fetchColumn(); 
+
+        if ($movieCount > 0) { 
+            $message = '<div class="alert alert-warning">No se puede borrar la categoría porque tiene películas asociadas. Elimina las películas primero.</div>';
+        } else { 
+            $stmtDeleteCategory = $link->prepare('DELETE FROM category WHERE category_id = :category_id'); 
+            $stmtDeleteCategory->bindParam(':category_id', $category_id); 
+            $stmtDeleteCategory->execute(); 
+            if ($stmtDeleteCategory->rowCount() > 0) { 
+                $message = '<div class="alert alert-success">¡Categoría eliminada correctamente!</div>'; 
+            } else { 
+                $message = '<div class="alert alert-error">Error al eliminar la categoría. (Contiene películas).</div>'; 
+            } 
+        } 
+    } catch (Exception $e) { 
+        die('Error ' . $e->getMessage()); 
+    } 
+}
 ?>
 <!--
     <div class="alert alert-success">¡Ejemplo mensaje de éxito!</div>
@@ -35,8 +60,17 @@ require 'connectionPDO.php';
         </form>
         <?php
         $stmtCategory = null;
-
-        if (!empty($category_film)) {
+        ?>
+        <nav>
+            <fieldset>
+                <legend>Acciones</legend>
+                <a href="create.php">
+                    <button>Crear Categoria</button>
+                </a>
+            </fieldset>
+        </nav>
+        <?php
+        if (!empty($category_film) && !isset($_GET['delete'])) {
             $stmtTable = $link->prepare('SELECT film.film_id, film.title, film.release_year, film.length FROM film, film_category WHERE film.film_id = film_category.film_id AND film_category.category_id = :category_film');
             $stmtTable->bindParam(':category_film', $category_film, PDO::PARAM_INT);
             $stmtTable->execute();
@@ -44,14 +78,6 @@ require 'connectionPDO.php';
 
             if ($films) {
         ?>
-                <nav>
-                    <fieldset>
-                        <legend>Acciones</legend>
-                        <a href="create.php">
-                            <button>Crear Categoria</button>
-                        </a>
-                    </fieldset>
-                </nav>
                 <table>
                     <thead>
                         <tr>
@@ -65,7 +91,7 @@ require 'connectionPDO.php';
                         <?php
                         foreach ($films as $film) {
                             printf(
-                                '<tr><td>%s</td><td>%d</td><td>%d</td>',
+                                '<tr><td>%s</td><td>%d</td><td>%d</td><td><input type="button" value="Cambiar categoría"></td>',
                                 $film->title,
                                 $film->release_year,
                                 $film->length
@@ -81,6 +107,10 @@ require 'connectionPDO.php';
         }
     } catch (Exception $e) {
         die('Se jodio: ' . $e->getMessage());
+    }
+
+    if(!empty($message)){
+        echo $message;
     }
     ?>
 </section>

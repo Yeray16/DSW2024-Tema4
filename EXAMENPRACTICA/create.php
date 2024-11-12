@@ -12,14 +12,12 @@
             $stmtInsertCategory->execute();
 
             if($stmtInsertCategory->rowCount() > 0) {
-                $message = '<div class="alert alert-success">¡Usuario insertado correctamente!</div>';
-                printf($message);
+                $message = '<div class="alert alert-success">¡Categoría insertada correctamente!</div>';
             }
 
         }   catch (Exception $e) {
             die('Error '.$e->getMessage());
         }
-    }
 ?>
 <section id="create">
     <h2>Nueva categoría</h2>
@@ -30,16 +28,20 @@
         if(!empty($message)){
             echo $message;
         }
+    } else {
     ?>
-    <form action="" method="post" autocomplete="off">
+    <form action="create.php" method="post" autocomplete="off">
         <fieldset>
             <legend>Datos de la categoría</legend>
             <label for="name">Nombre</label>
             <input type="text" name="name" id="name" required>
             <p></p>
             <input type="reset" value="Limpiar">            
-            <input type="submit" value="Crear">
+            <input type="submit" name ="create" value="Crear">
         </fieldset>
     </form>
+    <?php
+    }
+    ?>
 </section>
 <?php include "bottom.php"; ?>
