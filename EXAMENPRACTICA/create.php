@@ -1,10 +1,37 @@
-<?php include "top.php"; ?>
+<?php 
+    include "top.php"; 
+    require 'connectionPDO.php';
+    $message = '';
+    if (isset($_POST['create'])) {
+
+        try{
+            $category_name =isset($_POST['name']) ? ($_POST['name']) : '';
+
+            $stmtInsertCategory = $link->prepare('INSERT INTO category (category_id, name, last_update) VALUES (NULL, :name, CURRENT_TIMESTAMP)');
+            $stmtInsertCategory->bindParam(':name', $category_name);
+            $stmtInsertCategory->execute();
+
+            if($stmtInsertCategory->rowCount() > 0) {
+                $message = '<div class="alert alert-success">¡Usuario insertado correctamente!</div>';
+                printf($message);
+            }
+
+        }   catch (Exception $e) {
+            die('Error '.$e->getMessage());
+        }
+    }
+?>
 <section id="create">
     <h2>Nueva categoría</h2>
     <nav>
         <p><a href="film.php">Volver</a></p>
     </nav>
-    <form action="" autocomplete="off">
+    <?php
+        if(!empty($message)){
+            echo $message;
+        }
+    ?>
+    <form action="" method="post" autocomplete="off">
         <fieldset>
             <legend>Datos de la categoría</legend>
             <label for="name">Nombre</label>
