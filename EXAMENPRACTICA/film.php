@@ -11,14 +11,24 @@ if (isset($_GET['delete'])) {
         $movieCount = $stmtCheckMovies->fetchColumn(); 
 
         if ($movieCount > 0) { 
+<<<<<<< HEAD
             $message = '<div class="alert alert-error">No se puede borrar la categoría porque tiene películas asociadas. Elimina las películas primero.</div>';
+=======
+            $message = '<div class="alert alert-warning">No se puede borrar la categoría porque tiene películas asociadas. Elimina las películas primero.</div>';
+>>>>>>> 77391017b62d344e15ce56229cc112767a2d8b62
         } else { 
             $stmtDeleteCategory = $link->prepare('DELETE FROM category WHERE category_id = :category_id'); 
             $stmtDeleteCategory->bindParam(':category_id', $category_id); 
             $stmtDeleteCategory->execute(); 
             if ($stmtDeleteCategory->rowCount() > 0) { 
                 $message = '<div class="alert alert-success">¡Categoría eliminada correctamente!</div>'; 
+<<<<<<< HEAD
             }
+=======
+            } else { 
+                $message = '<div class="alert alert-error">Error al eliminar la categoría. (Contiene películas).</div>'; 
+            } 
+>>>>>>> 77391017b62d344e15ce56229cc112767a2d8b62
         } 
     } catch (Exception $e) { 
         die('Error ' . $e->getMessage()); 
@@ -89,7 +99,11 @@ if (isset($_GET['delete'])) {
                         <?php
                         foreach ($films as $film) {
                             printf(
+<<<<<<< HEAD
                                 '<tr><td>%s</td><td>%d</td><td>%d</td><td><a href="category_film.php?film_id=%d"><input type="submit" value="Cambiar categoría"></a></td>',
+=======
+                                '<tr><td>%s</td><td>%d</td><td>%d</td><td><input type="button" value="Cambiar categoría"></td>',
+>>>>>>> 77391017b62d344e15ce56229cc112767a2d8b62
                                 $film->title,
                                 $film->release_year,
                                 $film->length,
@@ -106,6 +120,10 @@ if (isset($_GET['delete'])) {
         }
     } catch (Exception $e) {
         die('Error: ' . $e->getMessage());
+    }
+
+    if(!empty($message)){
+        echo $message;
     }
 
     if(!empty($message)){
