@@ -5,17 +5,24 @@ if (isset($_GET['delete'])) {
     try { 
         $category_id = isset($_GET['category']) ? ($_GET['category']) : ''; // Verificar si la categoría tiene películas asociadas 
         
+
+        //Con la consulta se cuenta el número de películas que tiene una categoría
         $stmtCheckMovies = $link->prepare('SELECT COUNT(*) FROM film_category WHERE category_id = :category_id'); 
         $stmtCheckMovies->bindParam(':category_id', $category_id); 
         $stmtCheckMovies->execute(); 
+        //guardamos el número de películas asociadas en el contador
         $movieCount = $stmtCheckMovies->fetchColumn(); 
 
+        //Si el contador es mayor que 0, quiere decir que hay películas asociadas
         if ($movieCount > 0) { 
             $message = '<div class="alert alert-error">No se puede borrar la categoría porque tiene películas asociadas. Elimina las películas primero.</div>';
         } else { 
+            //Si no hay películas asociadas, se puede borrar la categoría
             $stmtDeleteCategory = $link->prepare('DELETE FROM category WHERE category_id = :category_id'); 
             $stmtDeleteCategory->bindParam(':category_id', $category_id); 
             $stmtDeleteCategory->execute(); 
+            
+            //con rowCount() verificamos si se ha eliminado alguna fila, si es > 0 es que la categoría fue eliminada
             if ($stmtDeleteCategory->rowCount() > 0) { 
                 $message = '<div class="alert alert-success">¡Categoría eliminada correctamente!</div>'; 
             }

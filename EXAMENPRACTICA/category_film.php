@@ -2,11 +2,15 @@
 include "top.php";
 require 'connectionPDO.php';
 
+//obtenemos el film_id de la URL
 $film_id = isset($_GET['film_id']) ? $_GET['film_id'] : '';
 
+//verificamos que la solicitud sea post y el film_id no esté vacío
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($film_id)) {
 
   try {
+
+    //iniciamos una transacción para garantizar que la eliminación y la insercción se hagan a la vez
     $link->beginTransaction();
 
     //Borrar todas las categorías actuales de la película
@@ -18,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($film_id)) {
     if (isset($_POST['categories'])) {
       $categories = $_POST['categories'];
 
+      //insertamos una nueva fila en film_category
       foreach ($categories as $category_id) {
         $stmtInsertAgain = $link->prepare('INSERT INTO film_category(film_id, category_id, last_update) VALUES (:film_id, :category_id, CURRENT_TIMESTAMP)');
         $stmtInsertAgain->bindParam(':film_id', $film_id, PDO::PARAM_INT);
@@ -26,9 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($film_id)) {
       }
     }
 
+    //Si todas las categorías se realizan correctamente se confimr la transacción
     $link->commit();
     $message = '<div class="alert alert-success">¡Categorías actualizadas correctamente!</div>';
   } catch (Exception $e) {
+    //si hay error se reinicia la transacción
     $link->rollBack();
     $message = '<div class="alert alert-error">Error al actualizar las categorías: '. $e->getMessage() . '</div>';
   }

@@ -7,10 +7,12 @@
         try{
             $category_name =isset($_POST['name']) ? ($_POST['name']) : '';
 
+            //Insertamos la categoría
             $stmtInsertCategory = $link->prepare('INSERT INTO category (category_id, name, last_update) VALUES (NULL, :name, CURRENT_TIMESTAMP)');
             $stmtInsertCategory->bindParam(':name', $category_name);
             $stmtInsertCategory->execute();
 
+            //Si es >0 significa que se ha insertado una categoría
             if($stmtInsertCategory->rowCount() > 0) {
                 $message = '<div class="alert alert-success">¡Categoría insertada correctamente!</div>';
             }
